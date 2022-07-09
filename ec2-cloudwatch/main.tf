@@ -126,11 +126,36 @@ resource "aws_instance" "main" {
   monitoring = true
 
   # CloudWatch Agent
-  user_data  = file("${path.module}/cloudwatch-agent-sh")
+  user_data = file("${path.module}/cloudwatch-agent.sh")
 
   network_interface {
     network_interface_id = aws_network_interface.main.id
     device_index         = 0
   }
 
+}
+
+### CloudWatch Alarm ###
+
+resource "aws_sns_topic" "alarm" {
+  name = "ec2-alarm-topic"
+}
+
+resource "aws_cloudwatch_metric_alarm" "ec2" {
+  alarm_name          = "ec2-cpu-alarm"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = "2"
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/EC2"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "0"
+  alarm_description   = "This metric monitors ec2 cpu utilization"
+
+  dimensions = {
+    InstanceId = aws_instance.main.id
+  }
+
+  actions_enabled = "true"
+  alarm_actions   = [aws_sns_topic.alarm.arn]
 }
