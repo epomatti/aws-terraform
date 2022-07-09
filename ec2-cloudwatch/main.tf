@@ -50,6 +50,15 @@ resource "aws_security_group_rule" "ingress_ssh" {
   security_group_id = aws_default_security_group.main.id
 }
 
+resource "aws_security_group_rule" "egress_all" {
+  type              = "egress"
+  from_port         = 0
+  to_port           = 65535
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_default_security_group.main.id
+}
+
 resource "aws_subnet" "main" {
   vpc_id     = aws_vpc.main.id
   cidr_block = "10.0.0.0/24"
@@ -83,10 +92,10 @@ resource "aws_iam_role_policy_attachment" "ssm-managed-instance-core" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
-# resource "aws_iam_role_policy_attachment" "cloudwatc-agent-server-policy" {
-#   role       = aws_iam_role.main.name
-#   policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
-# }
+resource "aws_iam_role_policy_attachment" "cloudwatc-agent-server-policy" {
+  role       = aws_iam_role.main.name
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+}
 
 ### Key Pair ###
 resource "aws_key_pair" "deployer" {
@@ -112,6 +121,9 @@ resource "aws_instance" "main" {
 
   iam_instance_profile = aws_iam_instance_profile.main.id
   key_name             = aws_key_pair.deployer.key_name
+
+  # Detailed monitoring enabled!
+  monitoring = true
 
   network_interface {
     network_interface_id = aws_network_interface.main.id
