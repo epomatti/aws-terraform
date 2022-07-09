@@ -28,6 +28,14 @@ resource "aws_vpc" "default" {
   }
 }
 
+resource "aws_internet_gateway" "default" {
+  vpc_id = aws_vpc.default.id
+
+  tags = {
+    Name = "igw"
+  }
+}
+
 resource "aws_subnet" "subnet1" {
   vpc_id     = aws_vpc.default.id
   cidr_block = "10.0.0.0/24"
@@ -103,19 +111,21 @@ resource "aws_rds_cluster" "mysql" {
   ]
 }
 
-# resource "aws_rds_cluster_instance" "cluster_instances" {
-#   identifier         = "aurora-cluster-instance"
-#   cluster_identifier = aws_rds_cluster.mysql.id
-#   instance_class     = var.db_instance_class
-#   engine             = aws_rds_cluster.mysql.engine
-#   engine_version     = aws_rds_cluster.mysql.engine_version
+resource "aws_rds_cluster_instance" "aurora_instances" {
 
-#   # Aurora can go up to 15 read replicas - managed automatically
-#   count = var.db_instance_count
+  # Aurora can go up to 15 read replicas - managed automatically
+  count = var.db_instance_count
 
-#   # CloudWatch Granualarity - 1 to 60 seconds
-#   monitoring_interval = 1
+  identifier         = "aurora-cluster-instance-${count.index}"
+  cluster_identifier = aws_rds_cluster.mysql.id
+  instance_class     = var.db_instance_class
+  engine             = aws_rds_cluster.mysql.engine
+  engine_version     = aws_rds_cluster.mysql.engine_version
 
-#   # Public access
-#   publicly_accessible = true
-# }
+  # CloudWatch Granualarity - 1 to 60 seconds
+  # Requires a role
+  # monitoring_interval = 15
+
+  # Public access
+  publicly_accessible = true
+}
