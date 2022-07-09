@@ -125,6 +125,9 @@ resource "aws_instance" "main" {
   # Detailed monitoring enabled!
   monitoring = true
 
+  # CloudWatch Agent
+  user_data  = file("${path.module}/cloudwatch-agent-sh")
+
   network_interface {
     network_interface_id = aws_network_interface.main.id
     device_index         = 0
