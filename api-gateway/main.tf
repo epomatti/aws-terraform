@@ -45,4 +45,11 @@ resource "aws_apigatewayv2_stage" "default" {
   api_id        = aws_apigatewayv2_api.main.id
   name          = "$default"
   deployment_id = aws_apigatewayv2_deployment.todos.id
+  auto_deploy   = true
+
+  default_route_settings {
+    throttling_burst_limit = 1
+    throttling_rate_limit  = 1
+  }
+
 }
