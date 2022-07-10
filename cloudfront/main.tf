@@ -88,17 +88,9 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   comment             = "My CloudFront"
   default_root_object = "index.html"
 
-  # logging_config {
-  #   include_cookies = false
-  #   bucket          = "mylogs.s3.amazonaws.com"
-  #   prefix          = "myprefix"
-  # }
-
-  # aliases = ["mysite.example.com", "yoursite.example.com"]
-
   default_cache_behavior {
-    allowed_methods  = ["GET"]
-    cached_methods   = ["GET"]
+    allowed_methods  = ["HEAD", "GET"]
+    cached_methods   = ["HEAD", "GET"]
     target_origin_id = local.origin_id
 
     forwarded_values {
@@ -115,7 +107,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     max_ttl                = 86400
   }
 
-  price_class = "PriceClass_200"
+  price_class = "PriceClass_100"
 
   restrictions {
     geo_restriction {
@@ -126,5 +118,6 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
 
   viewer_certificate {
     cloudfront_default_certificate = true
+    minimum_protocol_version       = "TLSv1.2_2021"
   }
 }
