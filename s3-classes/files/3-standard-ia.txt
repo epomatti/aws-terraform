@@ -1,0 +1,1 @@
+S3 Standard-IA (Infrequent Access)
