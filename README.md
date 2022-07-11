@@ -8,3 +8,4 @@ Terraform recipes.
 - EC2 CloudWatch - Agent and Alarms
 - ECS Fargate
 - Kinesis Data Streams
+- DynamoDB
