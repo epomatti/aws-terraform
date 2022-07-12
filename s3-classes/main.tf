@@ -24,22 +24,59 @@ resource "aws_s3_bucket_acl" "default" {
   acl    = "private"
 }
 
-# resource "aws_s3_bucket_policy" "cloudfront_oai" {
-#   bucket = aws_s3_bucket.bucket.id
-#   policy = data.aws_iam_policy_document.s3_policy.json
-# }
+resource "aws_s3_bucket_lifecycle_configuration" "bucket-config" {
+  bucket = aws_s3_bucket.bucket.bucket
 
-# data "aws_iam_policy_document" "s3_policy" {
-#   statement {
-#     actions   = ["s3:GetObject"]
-#     resources = ["${aws_s3_bucket.bucket.arn}/*"]
+  ###
 
-#     principals {
-#       type        = "AWS"
-#       identifiers = [aws_cloudfront_origin_access_identity.main.iam_arn]
-#     }
-#   }
-# }
+  ### Logs ###
+  rule {
+    id = "log"
+
+    expiration {
+      days = 356
+    }
+
+    filter {
+      and {
+        prefix = "log/"
+
+        tags = {
+          rule      = "log"
+          autoclean = "true"
+        }
+      }
+    }
+
+    status = "Enabled"
+
+    transition {
+      days          = 30
+      storage_class = "STANDARD_IA"
+    }
+
+    transition {
+      days          = 60
+      storage_class = "GLACIER"
+    }
+  }
+
+  ### Exclude Temporary ###
+  rule {
+    id = "tmp"
+
+    filter {
+      prefix = "tmp/"
+    }
+
+    expiration {
+      days = 1
+    }
+
+    status = "Enabled"
+  }
+}
+
 
 # resource "aws_s3_object" "index" {
 #   bucket         = aws_s3_bucket.bucket.bucket
