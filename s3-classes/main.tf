@@ -75,12 +75,11 @@ resource "aws_s3_bucket_lifecycle_configuration" "bucket-config" {
   }
 }
 
-# resource "aws_s3_object" "file1" {
-#   bucket         = aws_s3_bucket.main.bucket
-#   key            = "log//file1.txt"
-#   content_base64 = filebase64("${path.module}/index.html")
-
-# }
+resource "aws_s3_object" "file1" {
+  bucket         = aws_s3_bucket.main.bucket
+  key            = "log//file1.txt"
+  content_base64 = filebase64("${path.module}/files/file1.txt")
+}
 
 # resource "aws_s3_object" "saturn5" {
 #   bucket         = aws_s3_bucket.bucket.bucket
