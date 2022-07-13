@@ -15,19 +15,17 @@ provider "aws" {
 }
 
 ### S3 ###
-resource "aws_s3_bucket" "bucket" {
+resource "aws_s3_bucket" "main" {
   bucket = "bucket-cloudfront-999"
 }
 
 resource "aws_s3_bucket_acl" "default" {
-  bucket = aws_s3_bucket.bucket.id
+  bucket = aws_s3_bucket.main.id
   acl    = "private"
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "bucket-config" {
-  bucket = aws_s3_bucket.bucket.bucket
-
-  ###
+  bucket = aws_s3_bucket.main.bucket
 
   ### Logs ###
   rule {
@@ -77,11 +75,11 @@ resource "aws_s3_bucket_lifecycle_configuration" "bucket-config" {
   }
 }
 
-
-# resource "aws_s3_object" "index" {
-#   bucket         = aws_s3_bucket.bucket.bucket
-#   key            = "index.html"
+# resource "aws_s3_object" "file1" {
+#   bucket         = aws_s3_bucket.main.bucket
+#   key            = "log//file1.txt"
 #   content_base64 = filebase64("${path.module}/index.html")
+
 # }
 
 # resource "aws_s3_object" "saturn5" {
